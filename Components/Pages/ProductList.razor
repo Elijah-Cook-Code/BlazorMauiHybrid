@@ -1,0 +1,77 @@
+﻿@page "/products"
+@using PetStore.Data
+@using BlazorHybridApp.Services
+@inject ProductService ProductService
+
+<h3>Products</h3>
+
+@if (products == null)
+
+{
+    <p>Loading...</p>
+}
+
+else
+
+{
+    @if (products.Count == 0)
+
+    {
+        <p>No products available.</p>
+        <!-- Empty table structure with placeholder rows -->
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="2" class="text-center text-muted">No products to display</td>
+                </tr>
+            </tbody>
+        </table>
+    }
+
+    else
+
+    {
+        <!-- Display products in a table -->
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var product in products)
+
+                {
+                    <tr>
+                        <td>@product.Name</td>
+                        <td>@product.Price</td>
+                        <td>
+                            <button class="btn btn-danger" @onclick="() => DeleteProduct(product.ProductId)">Delete</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+@code {
+    private List<ProductEntity> products = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        products = await ProductService.GetProductsAsync();
+    }
+    private async Task DeleteProduct(int productId)
+    {
+        await ProductService.DeleteProductAsync(productId);
+        products = await ProductService.GetProductsAsync();
+    }
+}

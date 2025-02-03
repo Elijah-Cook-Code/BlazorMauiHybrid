@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using PetStore.Data;
+using BlazorHybridApp.Services;
 
 namespace BlazorHybridApp
 {
@@ -16,9 +19,18 @@ namespace BlazorHybridApp
 
             builder.Services.AddMauiBlazorWebView();
 
+            // Use the correct storage location, prefer FileSystem.AppDataDirectory for cross-platform compatibility
+            var dbPath = Path.Combine(FileSystem.AppDataDirectory, "PetStore.db");
+
+            builder.Services.AddDbContext<ProductContext>(options =>
+                options.UseSqlite($"Data Source={dbPath}"));
+
+            builder.Services.AddScoped<ProductService>();
+
+
 #if DEBUG
-    		builder.Services.AddBlazorWebViewDeveloperTools();
-    		builder.Logging.AddDebug();
+            builder.Services.AddBlazorWebViewDeveloperTools();
+            builder.Logging.AddDebug();
 #endif
 
             return builder.Build();
